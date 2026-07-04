@@ -11,11 +11,11 @@ function initMenu() {
   const resolvePageHref = (pageName) => {
     const pageBase = isInHtmlFolder ? '' : 'html/';
 
-    if (pageName.includes('puzzle-01')) return `${pageBase}puzzle-01.html`;
-    if (pageName.includes('puzzle-02')) return `${pageBase}puzzle-02.html`;
-    if (pageName.includes('puzzle-03')) return `${pageBase}puzzle-03.html`;
-    if (pageName.includes('puzzle-04')) return `${pageBase}puzzle-04.html`;
-    if (pageName.includes('puzzle-05')) return `${pageBase}puzzle-05.html`;
+    if (pageName.includes('puzzle_a91fj')) return `${pageBase}puzzle_a91fj.html`;
+    if (pageName.includes('puzzle_c2k8c')) return `${pageBase}puzzle_c2k8c.html`;
+    if (pageName.includes('puzzle_ea92j')) return `${pageBase}puzzle_ea92j.html`;
+    if (pageName.includes('puzzle_g9dk2')) return `${pageBase}puzzle_g9dk2.html`;
+    if (pageName.includes('puzzle_i4n0q')) return `${pageBase}puzzle_i4n0q.html`;
     return isInHtmlFolder ? '../index.html' : 'index.html';
   };
 
@@ -53,7 +53,7 @@ function initMenu() {
       { href: isInHtmlFolder ? 'credit.html' : 'html/credit.html', label: 'CREDIT' },
     ];
     if (isClearPage) {
-      defaultLinks.push({ href: isInHtmlFolder ? 'clear_98q4hvu5bweiebvq98w75v.html' : 'html/clear_98q4hvu5bweiebvq98w75v.html', label: 'GAME CLEAR' });
+      defaultLinks.push({ href: isInHtmlFolder ? 'clear_vu5bw.html' : 'html/clear_vu5bw.html', label: 'GAME CLEAR' });
     }
     const puzzleLinks = visitedPages.map((page) => ({
       href: resolvePageHref(page.pageName || ''),
@@ -108,13 +108,13 @@ function initMenu() {
 
   const pageName = window.location.pathname.split('/').pop() || 'index.html';
   const isClearPage = pageName.includes('clear_');
-  const isPuzzlePage = /puzzle-\d+/.test(pageName);
+  const isPuzzlePage = pageName.startsWith('puzzle_');
   const pageLabel = (() => {
-    if (pageName.includes('puzzle-01')) return 'Q1';
-    if (pageName.includes('puzzle-02')) return 'Q2';
-    if (pageName.includes('puzzle-03')) return 'Q3';
-    if (pageName.includes('puzzle-04')) return 'Q4';
-    if (pageName.includes('puzzle-05')) return 'Q5';
+    if (pageName.includes('puzzle_a91fj')) return 'Q1';
+    if (pageName.includes('puzzle_c2k8c')) return 'Q2';
+    if (pageName.includes('puzzle_ea92j')) return 'Q3';
+    if (pageName.includes('puzzle_g9dk2')) return 'Q4';
+    if (pageName.includes('puzzle_i4n0q')) return 'Q5';
     return 'HOME';
   })();
 
