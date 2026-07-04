@@ -23,6 +23,36 @@ const COLOR_NAME_MAP = {
   むらさき: 'purple',
   パープル: 'purple',
   purple: 'purple',
+  茶: 'brown',
+  ちゃ: 'brown',
+  ブラウン: 'brown',
+  brown: 'brown',
+  黄: 'yellow',
+  き: 'yellow',
+  イエロー: 'yellow',
+  yellow: 'yellow',
+  灰: 'gray',
+  はい: 'gray',
+  グレー: 'gray',
+  gray: 'gray',
+  だいだい: 'orange',
+  おれんじ: 'orange',
+  橙: 'orange',
+  オレンジ: 'orange',
+  orange: 'orange',
+  桃: 'pink',
+  ぴんく: 'pink',
+  もも: 'pink',
+  ピンク: 'pink',
+  pink: 'pink',
+  金: 'gold',
+  きん: 'gold',
+  ゴールド: 'gold',
+  gold: 'gold',
+  銀: 'silver',
+  ぎん: 'silver',
+  シルバー: 'silver',
+  silver: 'silver',
 };
 
 const COLOR_DISPLAY_MAP = {
@@ -32,6 +62,13 @@ const COLOR_DISPLAY_MAP = {
   white: '白',
   green: '緑',
   purple: '紫',
+  brown: '茶',
+  yellow: '黄',
+  gray: '灰',
+  orange: 'オレンジ',
+  pink: 'ピンク',
+  gold: '金',
+  silver: '銀',
 };
 
 const PUZZLE_STATE_STORAGE_KEY = 'ignore-colors-state';
@@ -194,7 +231,7 @@ const highlightRedInCredit = () => {
   }
 };
 
-const showColorDetectionMessage = (colorNames) => {
+const showColorDetectionMessage = (colorNames, answerValue) => {
   if (!Array.isArray(colorNames) || !colorNames.length) {
     return;
   }
@@ -210,7 +247,16 @@ const showColorDetectionMessage = (colorNames) => {
   messageContainer.id = 'color-detection-message';
 
   // Build message text
-  const colorTexts = colorNames.map(color => COLOR_DISPLAY_MAP[color] || color).join('、');
+  const detectedColors = [...colorNames];
+  const normalizedAnswer = answerValue.toLowerCase();
+
+  Object.entries(COLOR_NAME_MAP).forEach(([word, color]) => {
+    if (normalizedAnswer.includes(word.toLowerCase()) && !detectedColors.includes(color)) {
+      detectedColors.push(color);
+    }
+  });
+
+  const colorTexts = detectedColors.map(color => COLOR_DISPLAY_MAP[color] || color).join('、');
   messageContainer.textContent = `${colorTexts} を検出しました`;
 
   // body直下に追加
@@ -388,18 +434,40 @@ const initPuzzlePage = ({
   };
 
   const submitHandler = () => {
+    // 白検出時のボタン処理
+    const rawAnswerValue = answerInput.value;
+
+    const hasWhiteText =
+      rawAnswerValue.includes("しろ") ||
+      rawAnswerValue.includes("白") ||
+      rawAnswerValue.includes("ホワイト") ||
+      rawAnswerValue.includes("white");
+
+    const submitButton = document.querySelector('.puzzle-submit');
+
+    if (hasWhiteText && submitButton) {
+      submitButton.classList.add('is-white-hidden');
+
+      setTimeout(() => {
+        submitButton.style.transition = 'none';
+        submitButton.classList.remove('is-white-hidden');
+
+        requestAnimationFrame(() => {
+          submitButton.style.transition = '';
+        });
+      }, 3520);
+    }
+
     submitButton.disabled = true;
     answerInput.disabled = true;
     processingOverlay.classList.add('is-visible');
 
-    const answerValue = normalizeAnswer(answerInput.value).trim();
+    const answerValue = normalizeAnswer(rawAnswerValue).trim();
     const colorsToFade = resolveColorsToFade(answerValue);
     const didFade = fadeColorLayers(colorsToFade);
 
     // Show detected colors
-    if (colorsToFade.length > 0) {
-      showColorDetectionMessage(colorsToFade);
-    }
+    showColorDetectionMessage(colorsToFade, answerValue);
 
     highlightRedInCredit();
 
