@@ -435,6 +435,16 @@ h2 {
 .puzzle-submit {
   padding: 0.75rem 1.2rem;
   flex-shrink: 0;
+  transition: color 1s ease-out;
+}
+
+.puzzle-submit.is-white-hidden {
+  color: transparent;
+}
+
+.puzzle-submit.is-white-reset {
+  transition: none !important;
+  color: var(--text);
 }
 
 .puzzle-result {

@@ -434,11 +434,35 @@ const initPuzzlePage = ({
   };
 
   const submitHandler = () => {
+    // 白検出時のボタン処理
+    const rawAnswerValue = answerInput.value;
+
+    const hasWhiteText =
+      rawAnswerValue.includes("しろ") ||
+      rawAnswerValue.includes("白") ||
+      rawAnswerValue.includes("ホワイト") ||
+      rawAnswerValue.includes("white");
+
+    const submitButton = document.querySelector('.puzzle-submit');
+
+    if (hasWhiteText && submitButton) {
+      submitButton.classList.add('is-white-hidden');
+
+      setTimeout(() => {
+        submitButton.style.transition = 'none';
+        submitButton.classList.remove('is-white-hidden');
+
+        requestAnimationFrame(() => {
+          submitButton.style.transition = '';
+        });
+      }, 3520);
+    }
+
     submitButton.disabled = true;
     answerInput.disabled = true;
     processingOverlay.classList.add('is-visible');
 
-    const answerValue = normalizeAnswer(answerInput.value).trim();
+    const answerValue = normalizeAnswer(rawAnswerValue).trim();
     const colorsToFade = resolveColorsToFade(answerValue);
     const didFade = fadeColorLayers(colorsToFade);
 
