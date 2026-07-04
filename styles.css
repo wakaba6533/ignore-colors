@@ -36,7 +36,6 @@ body {
 
 .title-image {
   text-align: center;
-  /* margin: 20px 0 24px; */
 }
 
 .title-image img {
@@ -478,4 +477,32 @@ h2 {
 .credit-red-highlight {
   font-weight: bold;
   color: #000;
+}
+
+.color-detection-message {
+  position: fixed;
+  z-index: 10000;
+
+  padding: 0.6rem 0.8rem;
+  background: rgba(238, 200, 165, 0.94);
+  border: 1px solid #491700;
+  border-radius: 8px;
+
+  font-size: 0.9rem;
+  color: #222;
+  white-space: nowrap;
+
+  pointer-events: none;
+
+  opacity: 0;
+  transform: translateY(8px);
+
+  transition:
+    opacity .25s ease,
+    transform .25s ease;
+}
+
+.color-detection-message.visible {
+  opacity: 1;
+  transform: translateY(0);
 }

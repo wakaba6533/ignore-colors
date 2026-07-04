@@ -25,6 +25,15 @@ const COLOR_NAME_MAP = {
   purple: 'purple',
 };
 
+const COLOR_DISPLAY_MAP = {
+  red: '赤',
+  blue: '青',
+  black: '黒',
+  white: '白',
+  green: '緑',
+  purple: '紫',
+};
+
 const PUZZLE_STATE_STORAGE_KEY = 'nazo-color-state';
 
 const getPuzzleState = () => {
@@ -185,10 +194,83 @@ const highlightRedInCredit = () => {
   }
 };
 
+const showColorDetectionMessage = (colorNames) => {
+  if (!Array.isArray(colorNames) || !colorNames.length) {
+    return;
+  }
+
+  const answerInput = document.querySelector('#answer-input');
+  if (!answerInput) {
+    return;
+  }
+
+  // Create message container
+  const messageContainer = document.createElement('div');
+  messageContainer.className = 'color-detection-message';
+  messageContainer.id = 'color-detection-message';
+
+  // Build message text
+  const colorTexts = colorNames.map(color => COLOR_DISPLAY_MAP[color] || color).join('、');
+  messageContainer.textContent = `${colorTexts} を検出しました`;
+
+  // body直下に追加
+  document.body.appendChild(messageContainer);
+
+  // Submitボタンの位置を取得
+  const submitButton = document.querySelector(".puzzle-submit");
+  if (!submitButton) return;
+
+  const rect = submitButton.getBoundingClientRect();
+
+  // サイズ取得
+  messageContainer.style.visibility = "hidden";
+  messageContainer.classList.add("visible");
+
+  const messageRect = messageContainer.getBoundingClientRect();
+
+  // Submitボタンの真上に配置
+  messageContainer.style.left =
+    `${rect.right - messageRect.width}px`;
+
+  messageContainer.style.top =
+    `${Math.max(16, rect.top - messageRect.height - 12)}px`;
+
+  messageContainer.style.visibility = "";
+
+  // Trigger animation
+  requestAnimationFrame(() => {
+    messageContainer.classList.add("visible");
+  });
+
+  // Remove message after 1.5 seconds
+  setTimeout(() => {
+    messageContainer.classList.remove("visible");
+
+    setTimeout(() => {
+      messageContainer.remove();
+    }, 250);
+
+  }, 1250);
+};
+
+const hasSelectedColors = ({
+  required = [],
+  forbidden = [],
+}) => {
+  const selected = [...document.querySelectorAll("select")]
+    .map(select => select.value);
+
+  return (
+    required.every(color => selected.includes(color)) &&
+    forbidden.every(color => !selected.includes(color))
+  );
+};
+
 const initPuzzlePage = ({
   correctAnswer,
   nextPage,
   requiredColor,
+  colorMatcher,
   answerNormalizer,
   transitionDelay = 3000,
   colorResolver,
@@ -252,23 +334,25 @@ const initPuzzlePage = ({
   };
 
   const resolveColorsToFade = (answerValue) => {
+    // まず通常の色判定
+    let colors = findLayerColorsToFade();
+
+    // 必要なら追加・変更
     if (typeof colorResolver === 'function') {
-      const overrideColors = colorResolver(answerValue, {
+      colors = colorResolver(answerValue, {
         menuOpen: isMenuOpen(),
         firstPuzzleRoute: getPuzzleState().firstPuzzleRoute,
-      });
-
-      if (Array.isArray(overrideColors) && overrideColors.length) {
-        return findLayerColorsToFade(overrideColors);
-      }
+      }, colors);
     }
 
-    return findLayerColorsToFade();
+    return colors;
   };
 
   const evaluateAnswer = (hiddenColors, answerValue) => {
     const answerMatch = resolveAnswerMatch(answerValue, hiddenColors);
-    const colorMatch = !requiredColor || hiddenColors.includes(requiredColor);
+    const colorMatch = colorMatcher
+      ? colorMatcher(hiddenColors)
+      : (!requiredColor || hiddenColors.includes(requiredColor));
 
     if (answerMatch && colorMatch) {
       showResult('success');
@@ -305,6 +389,11 @@ const initPuzzlePage = ({
     const answerValue = normalizeAnswer(answerInput.value).trim();
     const colorsToFade = resolveColorsToFade(answerValue);
     const didFade = fadeColorLayers(colorsToFade);
+
+    // Show detected colors
+    if (colorsToFade.length > 0) {
+      showColorDetectionMessage(colorsToFade);
+    }
 
     highlightRedInCredit();
 

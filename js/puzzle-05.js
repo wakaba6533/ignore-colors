@@ -6,32 +6,48 @@ if (blackImage) {
     : '../images/5_black.png';
 }
 
+const normalizeAnswer5 = (value) => {
+  const variants = ['オシドリ', 'おしどり', '鴛鴦'];
+  const normalized = value.toLowerCase().replace(/\s/g, '');
+  if (variants.some(v => v.toLowerCase().replace(/\s/g, '') === normalized)) {
+    return 'おしどり';
+  }
+  return value;
+};
+
 initPuzzlePage({
   correctAnswer: 'おしどり',
   nextPage: 'clear_98q4hvu5bweiebvq98w75v.html',
   requiredColor: '',
+  answerNormalizer: normalizeAnswer5,
+
   answerMatcher: (answerValue, hiddenColors, context) => {
     const menuOpen = !!context?.menuOpen;
     const firstPuzzleRoute = context?.firstPuzzleRoute;
 
     return answerValue === 'おしどり' && menuOpen && firstPuzzleRoute === 'riaou';
   },
-  colorResolver: (answerValue, context) => {
+
+  colorResolver: (answerValue, context, colors) => {
+    const result = [...colors];
+
     const menuOpen = !!context?.menuOpen;
     const firstPuzzleRoute = context?.firstPuzzleRoute;
 
-    if (menuOpen && firstPuzzleRoute === 'makuake') {
-      return ['red', 'black'];
+    result.push('green');
+
+    if (menuOpen && !result.includes('red')) {
+      result.push('red');
     }
 
-    if (menuOpen && firstPuzzleRoute === 'riaou') {
-      return ['red'];
+    if (firstPuzzleRoute === 'makuake' && !result.includes('black')) {
+      result.push('black');
     }
 
-    if (firstPuzzleRoute === 'makuake') {
-      return ['black'];
+    if (firstPuzzleRoute === 'riaou' && !result.includes('blue')) {
+      result.push('blue');
     }
 
-    return [];
+    return result;
   },
 });
