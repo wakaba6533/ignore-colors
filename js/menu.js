@@ -16,6 +16,8 @@ function initMenu() {
     if (pageName.includes('puzzle_ea92j')) return `${pageBase}puzzle_ea92j.html`;
     if (pageName.includes('puzzle_g9dk2')) return `${pageBase}puzzle_g9dk2.html`;
     if (pageName.includes('puzzle_i4n0q')) return `${pageBase}puzzle_i4n0q.html`;
+    if (pageName.includes('clear_vu5bw')) return `${pageBase}clear_vu5bw.html`;
+
     return isInHtmlFolder ? '../index.html' : 'index.html';
   };
 
@@ -52,9 +54,6 @@ function initMenu() {
       { href: isInHtmlFolder ? '../index.html' : 'index.html', label: 'HOME' },
       { href: isInHtmlFolder ? 'credit.html' : 'html/credit.html', label: 'CREDIT' },
     ];
-    if (isClearPage) {
-      defaultLinks.push({ href: isInHtmlFolder ? 'clear_vu5bw.html' : 'html/clear_vu5bw.html', label: 'GAME CLEAR' });
-    }
     const puzzleLinks = visitedPages.map((page) => ({
       href: resolvePageHref(page.pageName || ''),
       label: page.label,
@@ -109,12 +108,14 @@ function initMenu() {
   const pageName = window.location.pathname.split('/').pop() || 'index.html';
   const isClearPage = pageName.includes('clear_');
   const isPuzzlePage = pageName.startsWith('puzzle_');
+  const isTrackablePage = isPuzzlePage || isClearPage;
   const pageLabel = (() => {
     if (pageName.includes('puzzle_a91fj')) return 'Q1';
     if (pageName.includes('puzzle_c2k8c')) return 'Q2';
     if (pageName.includes('puzzle_ea92j')) return 'Q3';
     if (pageName.includes('puzzle_g9dk2')) return 'Q4';
     if (pageName.includes('puzzle_i4n0q')) return 'Q5';
+    if (pageName.includes('clear_')) return 'GAME CLEAR';
     return 'HOME';
   })();
 
@@ -123,7 +124,7 @@ function initMenu() {
   const state = getPuzzleState();
   const visitedPages = Array.isArray(state.visitedPages) ? state.visitedPages : [];
   const pageAlreadyRecorded = visitedPages.some((entry) => entry.pageName === pageName.replace('.html', ''));
-  if (!pageAlreadyRecorded && pageName !== 'index.html' && isPuzzlePage) {
+  if (!pageAlreadyRecorded && pageName !== 'index.html' && isTrackablePage) {
     visitedPages.push({ href: pageHref, label: pageLabel, pageName: pageName.replace('.html', '') });
   }
   savePuzzleState({ visitedPages });
