@@ -15,7 +15,7 @@ initPuzzlePage({
 
   colorMatcher: () =>
     hasSelectedColors({
-      required: ['purple'],
+      required: ['orange'],
       forbidden: ['blue', 'green', 'black'],
     }),
 
